@@ -5,6 +5,10 @@ from flwr.client import start_numpy_client, NumPyClient
 import keras as ks
 
 from utils import load_partition
+from flwr.client import ClientApp, NumPyClient
+from flwr.client.mod import fixedclipping_mod, secaggplus_mod
+
+
 
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -52,6 +56,20 @@ class FederatedClient(NumPyClient):
         loss, accuracy = model.evaluate(X_val, y_val)
         print("****** CLIENT ACCURACY: ", accuracy, " ******")
         return loss, len(X_val), {"accuracy": accuracy}
+
+    def client_fn(cid: str):
+        """Create and return an instance of Flower `Client`."""
+        trainloader, testloader = load_partition(partition_id=int(cid))
+        return FederatedClient(trainloader, testloader).to_client()
+
+    # Flower ClientApp
+    app = ClientApp(
+        client_fn=client_fn,
+        mods=[
+
+            fixedclipping_mod,
+        ],
+    )
 
 if __name__ == '__main__':
     start_numpy_client(server_address="localhost:8080", client=FederatedClient())
