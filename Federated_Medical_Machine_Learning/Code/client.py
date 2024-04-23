@@ -7,7 +7,7 @@ import keras as ks
 
 from utils import load_partition
 from flwr.client import ClientApp, NumPyClient
-from flwr.client.mod import fixedclipping_mod, secaggplus_mod
+#from flwr.client.mod import fixedclipping_mod, secaggplus_mod
 
 
 
