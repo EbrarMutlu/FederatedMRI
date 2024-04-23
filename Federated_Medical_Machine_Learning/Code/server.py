@@ -3,6 +3,8 @@ from typing import Dict, Optional, Tuple, List
 import flwr as fl
 import keras as ks
 from flwr.server import ServerConfig
+from flwr.server.strategy import DifferentialPrivacyClientSideFixedClipping
+
 from utils import load_testing_data
 from flwr.server import Driver, LegacyContext, ServerApp, ServerConfig
 
@@ -52,9 +54,13 @@ strategy = fl.server.strategy.FedAvg(
     evaluate_fn=get_eval_fn(),  # Ensure this function uses the correct 'evaluate' that utilizes 'create_model'
 
 )
+strategy = DifferentialPrivacyClientSideFixedClipping(
+    strategy, noise_multiplier=0.2, clipping_norm=10, num_sampled_clients=4
+)
 
 app = ServerApp()
 
 if __name__ == '__main__':
     config = ServerConfig(num_rounds=10)
     fl.server.start_server(server_address=f"{server_address}:{port_number}", strategy=strategy, config=config)
+
