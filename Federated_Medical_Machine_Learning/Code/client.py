@@ -7,7 +7,7 @@ import keras as ks
 
 from utils import load_partition
 from flwr.client import ClientApp, NumPyClient
-#from flwr.client.mod import fixedclipping_mod, secaggplus_mod
+from flwr.client.mod import fixedclipping_mod, secaggplus_mod
 
 
 
@@ -75,10 +75,10 @@ class FederatedClient(NumPyClient):
     # Flower ClientApp
     app = ClientApp(
         client_fn=client_fn,
-        ##mods=[
-        ##
-        ##    fixedclipping_mod,
-        ##],
+        mods=[
+        
+            fixedclipping_mod,
+        ],
     )
 
 if __name__ == '__main__':
