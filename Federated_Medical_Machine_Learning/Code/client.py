@@ -1,6 +1,7 @@
 import os
 import sys
 
+import numpy as np
 from flwr.client import start_numpy_client, NumPyClient
 import keras as ks
 
@@ -55,7 +56,16 @@ class FederatedClient(NumPyClient):
         model.set_weights(parameters)
         loss, accuracy = model.evaluate(X_val, y_val)
         print("****** CLIENT ACCURACY: ", accuracy, " ******")
+        # Predict labels for validation data
+        y_pred = np.argmax(model.predict(X_val), axis=1)
+
+        # Calculate the number of correct guesses for each label
+        correct_guesses = [np.sum((y_pred == i) & (y_val == i)) for i in range(4)]
+
+        print("Correct Guesses for Each Label:", correct_guesses)
+
         return loss, len(X_val), {"accuracy": accuracy}
+
 
     def client_fn(cid: str):
         """Create and return an instance of Flower `Client`."""
@@ -65,10 +75,10 @@ class FederatedClient(NumPyClient):
     # Flower ClientApp
     app = ClientApp(
         client_fn=client_fn,
-        mods=[
-
-            fixedclipping_mod,
-        ],
+        ##mods=[
+        ##
+        ##    fixedclipping_mod,
+        ##],
     )
 
 if __name__ == '__main__':
